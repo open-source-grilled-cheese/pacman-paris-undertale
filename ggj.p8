@@ -7,6 +7,17 @@ animations = {
 		curr = 0,
 		final = 30,
 		active = false
+	},
+	p = {
+		curr = 0,
+		final = 15,
+		dir = 0,
+		-- 0 is neutral
+		-- 1 is left
+		-- 2 is right
+		-- 3 is up
+		-- 4 is down
+		active = false
 	}
 }
 p = {
@@ -23,8 +34,8 @@ npcs = {
 		x = 0,
 		y = 0,
 		width = 16,
-		height = 16,
-		sprite = 6,
+		height = 32,
+		sprite = 68,
 		lines = {
 			"hey there!",
 			"goodbye."
@@ -38,8 +49,8 @@ npcs = {
 		x = 128,
 		y = 128,
 		width = 16,
-		height = 16,
-		sprite = 4,
+		height = 32,
+		sprite = 66,
 		lines = {
 			"what's up?",
 			"farewell."
@@ -53,8 +64,8 @@ npcs = {
 		x = 64,
 		y = 16,
 		width = 16,
-		height = 16,
-		sprite = 4,
+		height = 32,
+		sprite = 64,
 		lines = {
 			"what do you want?!!"
 		},
@@ -204,24 +215,29 @@ function _update_battle()
 end
 
 function move_player()
+	animations.p.dir = 0
 	if btn(⬅️) then
 		p.x -= 1
+		animations.p.dir = 1
 		if chk_npc_coll(0) then
 			p.x += 1
 		end
 	elseif btn(➡️) then
 		p.x += 1
+		animations.p.dir = 2
 				if chk_npc_coll(0) then
 			p.x -= 1
 		end
 	end
 	if btn(⬆️) then
 		p.y -= 1
+		animations.p.dir = 3
 		if chk_npc_coll(0) then
 			p.y += 1
 		end
 	elseif btn(⬇️) then
 		p.y += 1
+		animations.p.dir = 4
 		if chk_npc_coll(0) then
 			p.y -= 1
 		end
@@ -265,6 +281,17 @@ function update_animations()
 		animations.bob.active = true
 	else
 		animations.bob.active = false
+	end
+
+	if animations.p.curr == animations.p.final then
+		animations.p.curr = 0
+	else
+		animations.p.curr += 1
+	end
+	if animations.p.curr < animations.p.final/2 then
+		animations.p.active = true
+	else
+		animations.p.active = false
 	end
 end
 -->8
@@ -322,8 +349,34 @@ end
 
 function _draw_walk()
 	-- draw player
-	cls(0)
-	spr(128, p.x, p.y, 2, 4)
+	cls(1)
+	if animations.p.dir == 0 then
+		spr(128, p.x, p.y, 2, 4)
+	elseif animations.p.dir == 1 then
+		if animations.p.active then
+			spr(130, p.x, p.y, 2, 4, true, false)
+		else
+			spr(132, p.x, p.y, 2, 4, true, false)
+		end
+	elseif animations.p.dir == 2 then
+		if animations.p.active then
+			spr(130, p.x, p.y, 2, 4, false, false)
+		else
+			spr(132, p.x, p.y, 2, 4, false, false)
+		end
+	elseif animations.p.dir == 3 then
+		if animations.p.active then
+			spr(136, p.x, p.y, 2, 4, false, false)
+		else
+			spr(136, p.x, p.y, 2, 4, true, false)
+		end
+	elseif animations.p.dir == 4 then
+		if animations.p.active then
+			spr(134, p.x, p.y, 2, 4, true, false)
+		else
+			spr(134, p.x, p.y, 2, 4, false, false)
+		end
+	end
 
 	-- draw npcs
 	draw_npcs()
@@ -355,7 +408,7 @@ end
 
 function draw_npcs()
 	for npc in all(npcs) do
-		spr(npc.sprite, npc.x, npc.y, 2, 2)
+		spr(npc.sprite, npc.x, npc.y, 2, 4)
 		if npc.active then
 			if animations.bob.active then
 				_offset = -1
@@ -493,14 +546,14 @@ bbbbb0000000bbbb666979c76672888600000000663333b13333333b66666665556666665555a555
 bbbbb0000000bbbbbbbb99cccb2b878b00000000663333b13333333b666666665566666655555555333d33d33d33333300000000000000000000000000000000
 bbbbbbbb0bbbbbbbbbbbbbbccbbbb8bb0000000063333333333333bb6666666555666666555a55553333d3333333333300000000000000000000000000000000
 bbbbbbb888bbbbbbbbbbbbbbbbbbbbbb0000000063333333333333bb666666655666666655555555333d33333333333300000000000000000000000000000000
-bbbbb888888bbbbbbbbbb33666333333333000003333bd333b33331b666666655566666655555555333333d333d3333300000000000000000000000000000000
-bbbb88888888bbbbbbbb336666333333333000003333bd533b55351b66666665556666665555555533d33d33333d333300000000000000000000000000000000
-bbbbfb8888bfbbbbbb33666633333333333000003333b55bb555331b6666666655666666555555553d3333d33333333300000000000000000000000000000000
-bbbbfb8888bfbbbb333666633333333333330000b131b155b555331b6666666555666666a555555533d33333333d333300000000000000000000000000000000
-bbbbfb8888bfbbbb336666333333333333330000b135bb55b511311b666666655566666655a5555533333d3333333d3300000000000000000000000000000000
-bbbbfb8888bfbbbb366633333333333333333000bb1d515555b131bb6666666556666666555555553333d333333333d300000000000000000000000000000000
-bbbbfb8888bfbbbb366333333333333333333000bb11d55555bb31bb6666666556666666555a555533333d333333333300000000000000000000000000000000
-bbbbfb8888bfbbbb333333333333333310111000bbbb1d555513355b666666655666666655555555333333333333333300000000000000000000000000000000
+bbbbb888888bbbbbbbbbb33666333333333bbbbb3333bd333b33331b666666655566666655555555333333d333d3333300000000000000000000000000000000
+bbbb88888888bbbbbbbb336666333333333bbbbb3333bd533b55351b66666665556666665555555533d33d33333d333300000000000000000000000000000000
+bbbbfb8888bfbbbbbb33666633333333333bbbbb3333b55bb555331b6666666655666666555555553d3333d33333333300000000000000000000000000000000
+bbbbfb8888bfbbbb33366663333333333333bbbbb131b155b555331b6666666555666666a555555533d33333333d333300000000000000000000000000000000
+bbbbfb8888bfbbbb33666633333333333333bbbbb135bb55b511311b666666655566666655a5555533333d3333333d3300000000000000000000000000000000
+bbbbfb8888bfbbbb366633333333333333333bbbbb1d515555b131bb6666666556666666555555553333d333333333d300000000000000000000000000000000
+bbbbfb8888bfbbbb366333333333333333333bbbbb11d55555bb31bb6666666556666666555a555533333d333333333300000000000000000000000000000000
+bbbbfb8888bfbbbb333333333333333310111bbbbbbb1d555513355b666666655666666655555555333333333333333300000000000000000000000000000000
 bbbbfb000bbfbbbb33333333333333331b11bbbbbbbbb155551331bb4444544445444454555a5555666666660000000000000000000000000000000000000000
 bbbbb22222bbbbbb333334333bb331b31b11bbbbbbbbbb5555133bbb444454444544445455555555666666660000000000000000000000000000000000000000
 bbbbb22222bbbbbbbb3334bbbb4411b11bbbbbbbbbbbbb5555535bbb44445444454445545555a555666666660000000000000000000000000000000000000000
