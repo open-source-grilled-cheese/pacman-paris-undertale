@@ -1,14 +1,104 @@
 pico-8 cartridge // http://www.pico-8.com
 version 27
 __lua__
+-- base functions
+
 function _init()
+	init_player()
+	init_npcs()
+	init_textbox()
+end
+
+
+function _update()
+	if  not p.talking then
+		move_player()
+		check_talking()
+	else npc_talk()
+	end
+		
+	camera(p.x-64,p.y-64)
+end
+
+-- checks closeness to npc, rad = radius (0 = collision)
+function chk_npc_coll(rad)
+	local i = 1
+	for npc in all(npcs) do
+		if p.x-rad <= npc.x+npc.width and
+		   p.x + p.width >= npc.x-rad and
+		   p.y-rad <= npc.y+npc.height and
+		   p.y + p.height >= npc.y-rad then
+		   return i
+	 end
+	i+= 1
+	end
+	return nil
+end
+
+
+function _draw()
+	-- draw player
+	cls(15)
+	spr(2, p.x, p.y, 2, 4)
+	
+	-- draw npcs
+	draw_npcs()
+	
+	-- draw textbox
+	if p.talking then
+		sp = 8
+		sx = (sp % 16) * 8
+		sy = (sp \ 16) * 8
+		sspr(sx, sy, 16, 16, p.x - (textbox.width/2), p.y-60, textbox.width, textbox.height)
+		print(talking_iter, p.x - (textbox.width/2) + 10, p.y-50, 8)
+	end
+	
+
+end
+-->8
+-- player functions
+
+-- initializes player table
+function init_player()
 	p = {
 		x = 64,
 		y = 64,
 		width = 16,
-		height = 32
+		height = 32,
+		talking = nil
 	}
+end
 
+-- moves the player, checks if collision, and then moves back if so
+function move_player()
+	if btn(⬅️) then
+		p.x -= 1
+		if chk_npc_coll(0) then
+			p.x += 1
+		end
+	elseif btn(➡️) then
+		p.x += 1
+				if chk_npc_coll(0) then
+			p.x -= 1
+		end
+	end
+	if btn(⬆️) then
+		p.y -= 1
+		if chk_npc_coll(0) then
+			p.y += 1
+		end
+	elseif btn(⬇️) then
+		p.y += 1
+		if chk_npc_coll(0) then
+			p.y -= 1
+		end
+	end
+end
+-->8
+-- npc functions
+
+-- intializes npcs
+function init_npcs()
 	npcs = {}
 	add(npcs, {
 		x = 0,
@@ -26,78 +116,73 @@ function _init()
 	})
 end
 
-
-function _update()
-	if btn(⬅️) then
-		p.x -= 1
-		if chk_npc_coll() then
-			p.x += 1
-		end
-	elseif btn(➡️) then
-		p.x += 1
-				if chk_npc_coll() then
-			p.x -= 1
-		end
-	end
-	
-	if btn(⬆️) then
-		p.y -= 1
-		if chk_npc_coll() then
-			p.y += 1
-		end
-	elseif btn(⬇️) then
-		p.y += 1
-		if chk_npc_coll() then
-			p.y -= 1
-		end
-	end
-		
-	camera(p.x-60,p.y-60)
-end
-
-function chk_npc_coll()
-	for npc in all(npcs) do
-		if p.x <= npc.x+npc.width and
-		   p.x + p.width >= npc.x and
-		   p.y <= npc.y+npc.height and
-		   p.y + p.height >= npc.y then
-		   return true
-	 end
-	end
-	return false
-end
-
-function _draw()
-	-- draw player
-	cls(0)
-	spr(2, p.x, p.y, 2, 4)
-	
-	-- draw npcs
-	draw_npcs()
-end
-
+-- draws all npcs
 function draw_npcs()
 	for npc in all(npcs) do
 		spr(npc.sprite, npc.x, npc.y, 2, 2)
 end
 end
+-->8
+-- talking functions
+
+-- initializes textbox size
+function init_textbox()
+	textbox = {
+		width = 110,
+		height = 30
+		}
+end
+
+-- when player presses z, sees if in proximity to talk
+function check_talking()
+	if btnp(🅾️) then
+		p.talking = chk_npc_coll(8)
+		if p.talking then
+			talking_iter = 0
+			npc_talk()
+		end
+	end
+end
+
+-- ran if talking, runs npc-specific talking function
+function npc_talk()
+	talks = {
+		npc1_talk,
+		npc2_talk
+		}
+		
+		talks[p.talking]()		
+end
+
+-- npc 1 talk function- has 3 textboxes of dialogue
+-- just prints the iter for right now
+function npc1_talk()
+	if btnp(🅾️) then talking_iter += 1
+	end
+	if talking_iter == 3 then
+		p.talking = nil
+	end
+end
+		
+
+
 __gfx__
-0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0070070000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0007700000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0007700000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0070070000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
-0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc6667666666667666000000000000000000000000000000000000000000000000
+0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc6667666666667666000000000000000000000000000000000000000000000000
+0070070000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc6667666666667666000000000000000000000000000000000000000000000000
+0007700000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc7777666666667777000000000000000000000000000000000000000000000000
+0007700000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc6666666666666666000000000000000000000000000000000000000000000000
+0070070000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc6666666666666666000000000000000000000000000000000000000000000000
+0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc6666666666666666000000000000000000000000000000000000000000000000
+0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc6666666666666666000000000000000000000000000000000000000000000000
+0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc6666666666666666000000000000000000000000000000000000000000000000
+0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc6666666666666666000000000000000000000000000000000000000000000000
+0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc6666666666666666000000000000000000000000000000000000000000000000
+0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc6666666666666666000000000000000000000000000000000000000000000000
+0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc7777666666667777000000000000000000000000000000000000000000000000
+0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc6667666666667666000000000000000000000000000000000000000000000000
+0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc6667666666667666000000000000000000000000000000000000000000000000
+0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc6667666666667666000000000000000000000000000000000000000000000000
 00000000000000003333333333333333000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000003333333333333333000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000003333333333333333000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
