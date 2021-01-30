@@ -18,6 +18,13 @@ animations = {
 		-- 3 is up
 		-- 4 is down
 		active = false
+	},
+	shake = {
+		x = 0,
+		y = 0,
+		strength = 0,
+		max_strength = 0.8,
+		fade_factor = 0.8
 	}
 }
 p = {
@@ -67,12 +74,12 @@ npcs = {
 		height = 32,
 		sprite = 64,
 		lines = {
-			"what do you want?!!"
+			"what do you want?!"
 		},
 		win_lines = {
 			"ah, sorry."
 		},
-		lose_lines = {
+		loss_lines = {
 			"stop wasting my time!"
 		}
 	}
@@ -82,6 +89,8 @@ battle = {
 		sprite = 196,
 		x = 64,
 		y = 64,
+		w = 8,
+		h = 8,
 		speed = 1.5
 	},
 	pickups = {
@@ -110,6 +119,8 @@ battle = {
 	enemy_ttl = 150,
 	collected = 0,
 	health = 3,
+	iframes = 20,
+	invincibility = 0,
 	win = false
 }
 
@@ -183,6 +194,7 @@ function _update_dialog()
 			dialog.curr += 1
 		elseif dialog.battle then
 			-- enter battle minigame
+			init_battle()
 			_update = _update_battle
 			_draw = _draw_battle
 		else
@@ -193,6 +205,15 @@ function _update_dialog()
 	end
 
 	camera(p.x-60, p.y-60)
+end
+
+function init_battle()
+	for pickup in all(pickups) do
+		pickup.active = true
+	end
+	battle.enemies = {}
+	battle.collected = 0
+	battle.health = 3
 end
 
 function _update_battle()
@@ -206,6 +227,11 @@ function _update_battle()
 		battle.p.y -= battle.p.speed
 	elseif btn(⬇️) and battle.p.y < 127 then
 		battle.p.y += battle.p.speed
+	end
+
+	-- deplete iframes
+	if battle.invincibility > 0 then
+		battle.invincibility -= 1
 	end
 
 	-- pickup logic
@@ -226,8 +252,17 @@ function _update_battle()
 		spawn_enemy()
 	end
 
-	-- enemy movement
+
 	for e in all(battle.enemies) do
+		-- enemy collision check
+		if battle.p.x >= e.x and
+		   battle.p.x <= e.x+e.w and
+		   battle.p.y >= e.y  and
+		   battle.p.y <= e.y+e.h and
+		   battle.invincibility == 0 then
+			take_dmg()
+		end
+		-- enemy movement
 		e.x += e.v.x
 		e.y += e.v.y
 		e.ttl -= 1
@@ -244,6 +279,35 @@ function _update_battle()
 		dialog.battle = false
 		dialog.curr = 1
 	end
+
+	-- loss condition
+	if battle.health <= 0 then
+		_update = _update_dialog
+		_draw = _draw_dialog
+		dialog.lines = dialog.active_npc.loss_lines
+		dialog.battle = false
+		dialog.curr = 1
+	end
+end
+
+function do_shake()
+	animations.shake.x = 16 - rnd(32)
+	animations.shake.x = 16 - rnd(32)
+	animations.shake.x *= animations.shake.strength
+	animations.shake.x *= animations.shake.strength
+
+	camera(animations.shake.x, animations.shake.y)
+
+	animations.shake.strength = animations.shake.strength*animations.shake.fade_factor
+	if animations.shake.strength < 0.05 then
+		animations.shake.strength = 0
+	end
+end
+
+function take_dmg()
+	battle.health -= 1
+	battle.invincibility = battle.iframes
+	animations.shake.strength = animations.shake.max_strength
 end
 
 function spawn_enemy()
@@ -253,7 +317,7 @@ function spawn_enemy()
 	_y = flr(rnd(32))+32  + 150*sin(_angle / 360)
 	_xvel = -1 * battle.enemy_speed*cos(_angle/360)
 	_yvel = -1 * battle.enemy_speed*sin(_angle/360)
-	add(battle.enemies, {x = _x, y = _y, v = {x = _xvel, y = _yvel}, ttl = battle.enemy_ttl})
+	add(battle.enemies, {x = _x, y = _y, v = {x = _xvel, y = _yvel}, ttl = battle.enemy_ttl, w = 8, h = 8})
 end
 
 function move_player()
@@ -412,8 +476,10 @@ function _draw_dialog()
 end
 
 function _draw_battle()
-	camera(0, 0)
+	-- camera(animations.shake.x, animations.shake.y)
 	cls(1)
+
+	do_shake()
 
 	for pickup in all(battle.pickups) do
 		if pickup.active then
@@ -426,6 +492,13 @@ function _draw_battle()
 	end
 
 	spr(battle.p.sprite, battle.p.x, battle.p.y)
+	if battle.invincibility > 0 then
+		circ(battle.p.x + 4, battle.p.y+4, 7, 7)
+	end
+
+	for h = 1, battle.health do
+		spr(170, h*16-16, 110, 2, 2)
+	end
 end
 
 function draw_player()
