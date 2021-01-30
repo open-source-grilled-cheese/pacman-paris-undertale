@@ -28,7 +28,9 @@ npcs = {
 		lines = {
 			"hey there!",
 			"goodbye."
-		}
+		},
+		win_lines = {},
+		lose_lines = {}
 	},
 	{
 		active = false,
@@ -41,7 +43,9 @@ npcs = {
 		lines = {
 			"what's up?",
 			"farewell."
-		}
+		},
+		win_lines = {},
+		lose_lines = {}
 	},
 	{
 		active = false,
@@ -52,12 +56,45 @@ npcs = {
 		height = 16,
 		sprite = 4,
 		lines = {
-			"a battle? have at you!"
+			"what do you want?!!"
+		},
+		win_lines = {
+			"ah, sorry."
+		},
+		lose_lines = {
+			"stop wasting my time!"
 		}
 	}
 }
+battle = {
+	p = {
+		x = 64,
+		y = 64,
+		speed = 1.5
+	},
+	pickups = {
+		{
+			x = 16,
+			y = 16,
+			w = 8,
+			h = 8,
+			active = true
+		},
+		{
+			x = 100,
+			y = 100,
+			w = 8,
+			h = 8,
+			active = true
+		}
+	},
+	collected = 0,
+	health = 3,
+	win = false
+}
 
 dialog = {
+	active_npc = {},
 	lines = {},
 	curr = 1,
 	battle = false
@@ -93,7 +130,7 @@ function _update_title()
 		_update = _update_intro()
 		_draw = _draw_intro()
 	end
-		
+
 	camera(0,0)
 end
 
@@ -132,7 +169,36 @@ function _update_dialog()
 end
 
 function _update_battle()
-	_x = 0
+	if btn(⬅️) and battle.p.x > 0 then
+		battle.p.x -= battle.p.speed
+	elseif btn(➡️) and battle.p.x < 127 then
+		battle.p.x += battle.p.speed
+	end
+	if btn(⬆️) and battle.p.y > 0 then
+		battle.p.y -= battle.p.speed
+	elseif btn(⬇️) and battle.p.y < 127 then
+		battle.p.y += battle.p.speed
+	end
+
+	for pickup in all(battle.pickups) do
+		if pickup.active then
+			if battle.p.x > pickup.x and
+			   battle.p.x < pickup.x+pickup.w and
+			   battle.p.y > pickup.y and
+			   battle.p.y < pickup.y+pickup.h then
+				pickup.active = false
+				battle.collected += 1
+			end
+		end
+	end
+
+	if battle.collected == #battle.pickups then
+		_update = _update_dialog
+		_draw = _draw_dialog
+		dialog.lines = dialog.active_npc.win_lines
+		dialog.battle = false
+		dialog.curr = 1
+	end
 end
 
 function move_player()
@@ -168,9 +234,10 @@ function chk_dialog()
 				-- enter dialog mode
 				_update = _update_dialog
 				_draw = _draw_dialog
+				dialog.active_npc = npc
 				dialog.lines = npc.lines
-				dialog.curr = 1
 				dialog.battle = npc.battle
+				dialog.curr = 1
 			end
 		end
 	end
@@ -211,17 +278,17 @@ function _draw_title()
 		spr(l, wx, wy, 1, 1)
 		wx += 8
 	end
-	
+
 	wy += 10
 	wx = 26
-	
+
 	for l in all(line2) do
 		spr(l, wx, wy, 1, 1)
 		wx += 8
 	end
-	
+
 	print("press 🅾️ to begin", 30, 64)
-		
+
 end
 
 function _draw_intro()
@@ -237,9 +304,9 @@ function _draw_intro()
 			_y += l[1]
 		end
 end
-	
-		
-		
+
+
+
 
 
 function _draw_walk()
@@ -263,8 +330,16 @@ function _draw_dialog()
 end
 
 function _draw_battle()
+	camera(0, 0)
 	cls(1)
-	spr(1, p.x, p.y)
+
+	for pickup in all(battle.pickups) do
+		if pickup.active then
+			spr(17, pickup.x, pickup.y)
+		end
+	end
+
+	spr(1, battle.p.x, battle.p.y)
 end
 
 function draw_npcs()
