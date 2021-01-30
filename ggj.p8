@@ -1,53 +1,119 @@
 pico-8 cartridge // http://www.pico-8.com
 version 27
 __lua__
+-- init data
+animations = {
+	bob = {
+		curr = 0,
+		final = 30,
+		active = false
+	}
+}
 p = {
 	x = 64,
 	y = 64,
-	interact_rad = 20
+	width=16,
+	height=16,
+	interact_rad = 25
 }
-
 npcs = {
 	{
-	active = false,
-	x = 0,
-	y = 0,
-	width = 32,
-	height = 32,
-	sprite = 2
+		active = false,
+		x = 0,
+		y = 0,
+		width = 16,
+		height = 16,
+		sprite = 6,
+		lines = {
+			"hey there!",
+			"goodbye."
+		}
 	},
 	{
-	active = false,
-	x = 128,
-	y = 128,
-	width = 32,
-	height = 32,
-	sprite = 4
+		active = false,
+		x = 128,
+		y = 128,
+		width = 16,
+		height = 16,
+		sprite = 4,
+		lines = {
+			"what's up?",
+			"farewell."
+		}
 	}
 }
 
-function _init()
+dialog = {
+	lines = {},
+	curr = 1
+}
 
+function _init()
+	_update = _update_walk
+	_draw = _draw_walk
 end
 
+-->8
+-- update functions
+function _update_walk()
 
-function _update()
-	if btn(⬅️) then
-		p.x -= 1
-	elseif btn(➡️) then
-		p.x += 1
-	end
-	
-	if btn(⬆️) then
-		p.y -= 1
-	elseif btn(⬇️) then
-		p.y += 1
-	end
+	move_player()
+	chk_dialog()
 	
 	update_npcs()
-	
+	update_animations()
 	
 	camera(p.x-60,p.y-60)
+end
+
+function _update_dialog()
+	if btnp(🅾️) then
+		if dialog.curr < #dialog.lines then
+			dialog.curr += 1
+		else
+			_update = _update_walk
+			_draw = _draw_walk
+		end
+	end
+end
+
+function move_player()
+	if btn(⬅️) then
+		p.x -= 1
+		if chk_npc_coll(0) then
+			p.x += 1
+		end
+	elseif btn(➡️) then
+		p.x += 1
+				if chk_npc_coll(0) then
+			p.x -= 1
+		end
+	end
+	if btn(⬆️) then
+		p.y -= 1
+		if chk_npc_coll(0) then
+			p.y += 1
+		end
+	elseif btn(⬇️) then
+		p.y += 1
+		if chk_npc_coll(0) then
+			p.y -= 1
+		end
+	end
+end
+
+function chk_dialog()
+	if btnp(🅾️) then
+		for npc in all(npcs) do
+			if npc.active then
+				-- enter dialog mode
+				_update = _update_dialog
+				_draw = _draw_dialog
+				dialog.lines = npc.lines
+				dialog.curr = 1
+			end
+		end
+	end
 end
 
 function update_npcs()
@@ -60,14 +126,21 @@ function update_npcs()
 	end
 end
 
--- function chk_npc_coll()
--- 	for npc in npcs do
--- 		if p.x <= npc.x+npc.width and
--- 		   p.x >= npc.x and
--- 	end
--- end
-
-function _draw()
+function update_animations()
+	if animations.bob.curr == animations.bob.final then
+		animations.bob.curr = 0
+	else
+		animations.bob.curr += 1
+	end
+	if animations.bob.curr < animations.bob.final/2 then
+		animations.bob.active = true
+	else
+		animations.bob.active = false
+	end
+end
+-->8
+-- draw functions
+function _draw_walk()
 	-- draw player
 	cls(0)
 	spr(2, p.x, p.y, 2, 2)
@@ -76,17 +149,48 @@ function _draw()
 	draw_npcs()
 end
 
+function _draw_dialog()
+	-- draw the background
+	_draw_walk()
+	
+	-- draw the dialog box
+	rectfill(p.x-60, p.y-60, p.x+64, p.y-32, 0)
+	rect(p.x-60, p.y-60, p.x+64, p.y-32, 7)
+	-- draw the text
+	print(dialog.lines[dialog.curr], p.x-56, p.y-56)
+end
+
 function draw_npcs()
 	for npc in all(npcs) do
 		spr(npc.sprite, npc.x, npc.y, 2, 2)
 		if npc.active then
-			circfill(npc.x+7, npc.y-10, 5, 7)
+			if animations.bob.active then
+				_offset = -1
+			else
+				_offset = 0
+			end
+			print("🅾️", npc.x+4, npc.y-10+_offset, 7)
 		end
 	end
 end
-
+-->8
+-- helper functions
 function dist(a_x, a_y, b_x, b_y)
 	return sqrt((a_x-b_x)^2 + (a_y-b_y)^2)	
+end
+
+function chk_npc_coll(rad)
+	local i = 1
+	for npc in all(npcs) do
+		if p.x-rad <= npc.x+npc.width and
+		   p.x + p.width >= npc.x-rad and
+		   p.y-rad <= npc.y+npc.height and
+		   p.y + p.height >= npc.y-rad then
+		   return i
+	 end
+	i+= 1
+	end
+	return nil
 end
 __gfx__
 0000000000000000bbbbbbbbbbbbbbbb8888888888888888cccccccccccccccc0000000000000000000000000000000000000000000000000000000000000000
