@@ -130,7 +130,7 @@ intro_text = {
 function _init()
 	_update = _update_title
 	_draw = _draw_title
-	base = 95
+	base = 110
 	palt(0, false)
 	palt(11, true)
 end
