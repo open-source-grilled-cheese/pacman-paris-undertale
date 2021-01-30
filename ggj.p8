@@ -270,8 +270,8 @@ end
 
 function _draw_title()
 	cls(0)
-	local line1 = {70, 71, 72, 30, 11, 12, 13, 14, 10, 15, 24}
-	local line2 = {25, 26, 27, 30, 28, 12, 29, 10}
+	local line1 = {70, 71, 72, 92, 73, 74, 75, 76, 72, 77, 86}
+	local line2 = {87, 88, 89, 92, 90, 74, 91, 72}
 	local wx = 8
 	local wy = 24
 	for l in all(line1) do
@@ -288,8 +288,13 @@ function _draw_title()
 	end
 
 	print("press 🅾️ to begin", 30, 64)
-
+	print ("◆ggj 2021◆", 40, 103)
+	print("joshua cepeda, erin markel,", 10, 111)
+	print("luke reifenberg, tanner waltz,", 5, 117)
+	print("and spencer wells ♥", 27, 123)
 end
+
+
 
 function _draw_intro()
 	cls(5)
