@@ -281,6 +281,7 @@ function _update_battle()
 		_update = _update_dialog
 		_draw = _draw_dialog
 		dialog.lines = dialog.active_npc.win_lines
+		dialog.active_npc.battle = false
 		dialog.battle = false
 		dialog.curr = 1
 	end
