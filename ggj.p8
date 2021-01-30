@@ -32,7 +32,8 @@ p = {
 	y = 64,
 	width=16,
 	height=32,
-	interact_rad = 35
+	interact_rad = 35,
+	exp = 2
 }
 npcs = {
 	{
@@ -57,8 +58,8 @@ npcs = {
 	{
 		active = false,
 		battle = false,
-		x = 128,
-		y = 128,
+		x = 300, -- 128
+		y = 300, -- 128
 		width = 16,
 		height = 32,
 		sprite = 66,
@@ -193,9 +194,12 @@ function _update_walk()
 
 	move_player()
 	chk_dialog()
+	
 
 	update_npcs()
 	update_animations()
+	
+	
 
 	camera(p.x-60,p.y-60)
 end
@@ -291,6 +295,12 @@ function _update_battle()
 		dialog.active_npc.battle = false
 		dialog.battle = false
 		dialog.curr = 1
+		p.exp += 1
+		
+		if p.exp == 2 then
+			npcs[2].x = 128
+			npcs[2].y = 128
+		end
 	end
 
 	-- loss condition
