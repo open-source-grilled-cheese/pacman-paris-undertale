@@ -37,8 +37,8 @@ npcs = {
 		height = 32,
 		sprite = 68,
 		lines = {
-			"hey there!",
-			"goodbye."
+			{"hey there!"},
+			{"goodbye."}
 		},
 		win_lines = {},
 		lose_lines = {}
@@ -52,8 +52,8 @@ npcs = {
 		height = 32,
 		sprite = 66,
 		lines = {
-			"what's up?",
-			"farewell."
+			{"what's up?"},
+			{"farewell."}
 		},
 		win_lines = {},
 		lose_lines = {}
@@ -67,13 +67,17 @@ npcs = {
 		height = 32,
 		sprite = 64,
 		lines = {
-			"what do you want?!!"
+			{"* you politely greet the", "young man. *"},
+			{"what do you need?"}
 		},
 		win_lines = {
-			"ah, sorry."
+			{"you are looking for a", "dominique bretodeau?"},
+			{"c'est moi!"},
+			{"* you know he is too young", "to be the person you are", "looking for *"},
+			{"* you thank him anyways *"}
 		},
 		lose_lines = {
-			"stop wasting my time!"
+			{"sorry, i'm not interested."}
 		}
 	}
 }
@@ -408,7 +412,11 @@ function _draw_dialog()
 	rectfill(p.x-60, p.y-60, p.x+64, p.y-32, 0)
 	rect(p.x-60, p.y-60, p.x+64, p.y-32, 7)
 	-- draw the text
-	print(dialog.lines[dialog.curr], p.x-56, p.y-56)
+	local b = 56
+	for l in all(dialog.lines[dialog.curr]) do
+		print(l, p.x-56, p.y-b)
+		b -= 6
+	end
 end
 
 function _draw_battle()
