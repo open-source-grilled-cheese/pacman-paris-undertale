@@ -124,7 +124,8 @@ battle = {
 	},
 	enemies = {},
 	enemy_max = 35,
-	enemy_speed = 1.5,
+	enemy_min_speed = 1.5,
+	enemy_speed_range = 2,
 	enemy_sprite = 104,
 	enemy_spawn_chance = 0.3,
 	enemy_ttl = 150,
@@ -287,6 +288,7 @@ function _update_battle()
 		_update = _update_dialog
 		_draw = _draw_dialog
 		dialog.lines = dialog.active_npc.win_lines
+		dialog.active_npc.battle = false
 		dialog.battle = false
 		dialog.curr = 1
 	end
@@ -324,10 +326,11 @@ end
 function spawn_enemy()
 	-- spawn enemy
 	_angle = flr(rnd(360))+1
-	_x = flr(rnd(64)) + 90*cos(_angle / 360)
-	_y = flr(rnd(32))+32  + 150*sin(_angle / 360)
-	_xvel = -1 * battle.enemy_speed*cos(_angle/360)
-	_yvel = -1 * battle.enemy_speed*sin(_angle/360)
+	_x = flr(rnd(32))+32 + 120*cos(_angle / 360)
+	_y = flr(rnd(32))+32 + 120*sin(_angle / 360)
+	_speed = rnd(battle.enemy_speed_range) + battle.enemy_min_speed
+	_xvel = -1 * _speed*cos(_angle/360)
+	_yvel = -1 * _speed*sin(_angle/360)
 	add(battle.enemies, {x = _x, y = _y, v = {x = _xvel, y = _yvel}, ttl = battle.enemy_ttl, w = 8, h = 8})
 end
 
