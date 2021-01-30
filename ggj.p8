@@ -101,20 +101,13 @@ dialog = {
 }
 
 text = {
-		{ 0, "your name is spencer wells,", 12 },
-		{ 8, "spencer wells", 64, 12},
-		{ 8, "and it is your 20th birthday.", 7 },
-		{ 8, "as is your clan's tradition,", 9},
-		{ 8, "you must venture to", 26},
-		{ 0, "the dungeon of danger.", 21},
-		{ 16, "dungeon of danger.", 37, 3},
-		{ 0, "can you collect the three relics", 0},
-		{ 8, "three relics", 80, 9},
-		{ 8, "and complete the sacred ritual?", 3},
-		{ 8, "or will you fall victim to", 13},
-		{ 0, "the birthday beasts", 25},
-		{ 8, "birthday beasts", 41, 8},
-		{ 8, "and thus end your lineage?", 12}
+		{ 8, "bonjour, amelie!", 30},
+		{ 8, "you found a box of mementos", 10, 12},
+		{ 8, "in the wall of your house", 13 },
+		{ 16, "belonging to a young boy.", 11 },
+		{ 8, "it is your duty to deliver", 9},
+		{ 8, "this box to its original owner", 3},
+		{ 8, "and bring him happiness.", 21},
 	}
 
 function _init()
@@ -127,8 +120,8 @@ end
 -- update functions
 function _update_title()
 	if btnp(🅾️) then
-		_update = _update_intro()
-		_draw = _draw_intro()
+		_update = _update_intro
+		_draw = _draw_intro
 	end
 
 	camera(0,0)
@@ -137,6 +130,11 @@ end
 function _update_intro()
 		if base > 5 then
 		base -= 0.6
+	 end
+	 
+	 if btnp(🅾️) then
+		_update = _update_walk
+		_draw = _draw_walk
 		end
 end
 
@@ -292,7 +290,7 @@ function _draw_title()
 end
 
 function _draw_intro()
-	cls(0)
+	cls(5)
 		local _y = 5
 		for l in all(text) do
 			if l[4] != nil then
@@ -302,6 +300,10 @@ function _draw_intro()
 			end
 			print(l[2], l[3], flr(_y+base), _c)
 			_y += l[1]
+		end
+		
+		if base <= 5 then
+		print("press 🅾️ to continue", 28, 100)
 		end
 end
 
