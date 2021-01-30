@@ -221,26 +221,26 @@ function move_player()
 		p.x -= 1
 		animations.p.dir = 1
 		if chk_npc_coll(0) then
-			p.x += 0
+			p.x += 1
 		end
 	elseif btn(➡️) then
 		p.x += 1
 		animations.p.dir = 2
 				if chk_npc_coll(0) then
-			p.x -= 0
+			p.x -= 1
 		end
 	end
 	if btn(⬆️) then
 		p.y -= 1
 		animations.p.dir = 3
 		if chk_npc_coll(0) then
-			p.y += 0
+			p.y += 1
 		end
 	elseif btn(⬇️) then
 		p.y += 1
 		animations.p.dir = 4
 		if chk_npc_coll(0) then
-			p.y -= 0
+			p.y -= 1
 		end
 	end
 end
@@ -439,10 +439,9 @@ end
 function chk_npc_coll(rad)
 	local i = 1
 	for npc in all(npcs) do
-		if p.x-rad <= npc.x+npc.width and
+	if p.x-rad <= npc.x+npc.width and
 		   p.x + p.width >= npc.x-rad and
-		   p.y-rad <= npc.y+npc.height and
-		   p.y + p.height >= npc.y-rad then
+		   p.y == npc.y then
 		   return i
 	 end
 	i+= 1
