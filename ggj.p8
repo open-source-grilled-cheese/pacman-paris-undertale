@@ -86,6 +86,7 @@ battle = {
 	},
 	pickups = {
 		{
+			sprite = 195,
 			x = 16,
 			y = 16,
 			w = 8,
@@ -93,6 +94,7 @@ battle = {
 			active = true
 		},
 		{
+			sprite = 195,
 			x = 100,
 			y = 100,
 			w = 8,
@@ -100,6 +102,11 @@ battle = {
 			active = true
 		}
 	},
+	enemies = {},
+	enemy_max = 10,
+	enemy_speed = 1,
+	enemy_sprite = 104,
+	enemy_spawn_time = 10,
 	collected = 0,
 	health = 3,
 	win = false
@@ -188,6 +195,7 @@ function _update_dialog()
 end
 
 function _update_battle()
+	-- player movement
 	if btn(⬅️) and battle.p.x > 0 then
 		battle.p.x -= battle.p.speed
 	elseif btn(➡️) and battle.p.x < 127 then
@@ -199,6 +207,7 @@ function _update_battle()
 		battle.p.y += battle.p.speed
 	end
 
+	-- pickup logic
 	for pickup in all(battle.pickups) do
 		if pickup.active then
 			if battle.p.x > pickup.x and
@@ -211,6 +220,11 @@ function _update_battle()
 		end
 	end
 
+	-- enemy spawning
+	if #battle.enemies < battle.enemy_max then
+		
+
+	-- win condition
 	if battle.collected == #battle.pickups then
 		_update = _update_dialog
 		_draw = _draw_dialog
@@ -218,6 +232,10 @@ function _update_battle()
 		dialog.battle = false
 		dialog.curr = 1
 	end
+end
+
+function spawn_enemy()
+	
 end
 
 function move_player()
@@ -381,11 +399,11 @@ function _draw_battle()
 
 	for pickup in all(battle.pickups) do
 		if pickup.active then
-			spr(17, pickup.x, pickup.y)
+			spr(pickup.sprite, pickup.x, pickup.y)
 		end
 	end
 
-	spr(1, battle.p.x, battle.p.y)
+	spr(battle.p.sprite, battle.p.x, battle.p.y)
 end
 
 function draw_player()
