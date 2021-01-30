@@ -103,10 +103,11 @@ battle = {
 		}
 	},
 	enemies = {},
-	enemy_max = 10,
-	enemy_speed = 1,
+	enemy_max = 35,
+	enemy_speed = 1.5,
 	enemy_sprite = 104,
-	enemy_spawn_time = 10,
+	enemy_spawn_chance = 0.3,
+	enemy_ttl = 150,
 	collected = 0,
 	health = 3,
 	win = false
@@ -221,8 +222,19 @@ function _update_battle()
 	end
 
 	-- enemy spawning
-	if #battle.enemies < battle.enemy_max then
-		
+	if #battle.enemies < battle.enemy_max and rnd() < battle.enemy_spawn_chance then
+		spawn_enemy()
+	end
+
+	-- enemy movement
+	for e in all(battle.enemies) do
+		e.x += e.v.x
+		e.y += e.v.y
+		e.ttl -= 1
+		if e.ttl < 0 then
+			del(battle.enemies, e)
+		end
+	end
 
 	-- win condition
 	if battle.collected == #battle.pickups then
@@ -235,7 +247,13 @@ function _update_battle()
 end
 
 function spawn_enemy()
-	
+	-- spawn enemy
+	_angle = flr(rnd(360))+1
+	_x = flr(rnd(64)) + 90*cos(_angle / 360)
+	_y = flr(rnd(32))+32  + 150*sin(_angle / 360)
+	_xvel = -1 * battle.enemy_speed*cos(_angle/360)
+	_yvel = -1 * battle.enemy_speed*sin(_angle/360)
+	add(battle.enemies, {x = _x, y = _y, v = {x = _xvel, y = _yvel}, ttl = battle.enemy_ttl})
 end
 
 function move_player()
@@ -401,6 +419,10 @@ function _draw_battle()
 		if pickup.active then
 			spr(pickup.sprite, pickup.x, pickup.y)
 		end
+	end
+
+	for e in all(battle.enemies) do
+		spr(battle.enemy_sprite, e.x, e.y)
 	end
 
 	spr(battle.p.sprite, battle.p.x, battle.p.y)
