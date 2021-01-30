@@ -33,7 +33,7 @@ p = {
 	width=16,
 	height=32,
 	interact_rad = 35,
-	exp = 2
+	exp = 0
 }
 npcs = {
 	{
@@ -52,7 +52,7 @@ npcs = {
 			{"do i know a", "dominique bretodeau?"}, {"c'est moi!"}, {"* you politely thank her", "and leave *"}
 		},
 		lose_lines = {
-			{"* you are wooed by the woman."}, {"you forgot to ask her your question. *"}
+			{"* you are wooed by the woman."}, {"you forgot to ask her your", "question. *"}
 		}
 	},
 	{
@@ -158,11 +158,20 @@ intro_text = {
 		{ 6, "you shall find him and return", 3},
 		{ 6, "his box!", 3}
 	}
+	
+	ending_text = {
+		{ 6, "you successfully returned", 30},
+		{ 12, "the box to dominique bretodeau!", 3},
+		{ 6, "your life's passion is now", 3},
+		{ 24, "to do good for others.", 3},
+		{ 6, "the end", 3}
+	}
 
 function _init()
 	_update = _update_title
 	_draw = _draw_title
 	base = 110
+	base2 = 110
 	palt(0, false)
 	palt(11, true)
 end
@@ -377,6 +386,12 @@ function move_player()
 end
 
 function chk_dialog()
+	-- end game
+		if p.exp == 3 then
+		_draw = _draw_ending
+		_update = _update_ending
+		end
+
 	-- check whether to enter dialog mode
 	if btnp(🅾️) then
 		for npc in all(npcs) do
@@ -425,6 +440,14 @@ function update_animations()
 	else
 		animations.p.active = false
 	end
+end
+
+function _update_ending()
+	camera(0,0)
+	
+	if base2 > 5 then
+		base2 -= 0.5
+	 end
 end
 -->8
 -- draw functions
@@ -579,6 +602,20 @@ function draw_npcs()
 			print("🅾️", npc.x+4, npc.y-10+_offset, 7)
 		end
 	end
+end
+
+function _draw_ending()
+	cls(5)
+	local _y = 5
+	for l in all(ending_text) do
+		if l[4] != nil then
+			_c = l[4]
+		else
+			_c = 7
+		end
+		print(l[2], l[3], flr(_y+base2), _c)
+		_y += l[1]
+		end
 end
 -->8
 -- helper functions
