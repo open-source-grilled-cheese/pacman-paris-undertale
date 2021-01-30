@@ -317,8 +317,8 @@ end
 function spawn_enemy()
 	-- spawn enemy
 	_angle = flr(rnd(360))+1
-	_x = flr(rnd(64)) + 90*cos(_angle / 360)
-	_y = flr(rnd(32))+32  + 150*sin(_angle / 360)
+	_x = flr(rnd(32))+32 + 120*cos(_angle / 360)
+	_y = flr(rnd(32))+32 + 120*sin(_angle / 360)
 	_xvel = -1 * battle.enemy_speed*cos(_angle/360)
 	_yvel = -1 * battle.enemy_speed*sin(_angle/360)
 	add(battle.enemies, {x = _x, y = _y, v = {x = _xvel, y = _yvel}, ttl = battle.enemy_ttl, w = 8, h = 8})
