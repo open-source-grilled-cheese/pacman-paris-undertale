@@ -44,11 +44,15 @@ npcs = {
 		height = 32,
 		sprite = 68,
 		lines = {
-			{"hey there!"},
-			{"goodbye."}
+			{"* you politely greet the", "beautiful lady. *"},
+			{"please join me for tea!"}
 		},
-		win_lines = {},
-		lose_lines = {}
+		win_lines = {
+			{"do i know a", "dominique bretodeau?"}, {"c'est moi!"}, {"* you politely thank her", "and leave *"}
+		},
+		lose_lines = {
+			{"* you are wooed by the woman."}, {"you forgot to ask her your question. *"}
+		}
 	},
 	{
 		active = false,
@@ -59,11 +63,14 @@ npcs = {
 		height = 32,
 		sprite = 66,
 		lines = {
-			{"what's up?"},
-			{"farewell."}
+			{"* you know in your heart", "that this is dominique. *"}
 		},
-		win_lines = {},
-		lose_lines = {}
+		win_lines = {
+			{"* you approach the old man *"}
+		},
+		lose_lines = {
+			{"* you are too nervous to approach. *"}
+		}
 	},
 	{
 		active = false,
