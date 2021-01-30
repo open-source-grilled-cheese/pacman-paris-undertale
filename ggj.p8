@@ -86,6 +86,7 @@ battle = {
 	},
 	pickups = {
 		{
+			sprite = 195,
 			x = 16,
 			y = 16,
 			w = 8,
@@ -93,6 +94,7 @@ battle = {
 			active = true
 		},
 		{
+			sprite = 195,
 			x = 100,
 			y = 100,
 			w = 8,
@@ -100,6 +102,12 @@ battle = {
 			active = true
 		}
 	},
+	enemies = {},
+	enemy_max = 35,
+	enemy_speed = 1.5,
+	enemy_sprite = 104,
+	enemy_spawn_chance = 0.3,
+	enemy_ttl = 150,
 	collected = 0,
 	health = 3,
 	win = false
@@ -188,6 +196,7 @@ function _update_dialog()
 end
 
 function _update_battle()
+	-- player movement
 	if btn(⬅️) and battle.p.x > 0 then
 		battle.p.x -= battle.p.speed
 	elseif btn(➡️) and battle.p.x < 127 then
@@ -199,6 +208,7 @@ function _update_battle()
 		battle.p.y += battle.p.speed
 	end
 
+	-- pickup logic
 	for pickup in all(battle.pickups) do
 		if pickup.active then
 			if battle.p.x > pickup.x and
@@ -211,6 +221,22 @@ function _update_battle()
 		end
 	end
 
+	-- enemy spawning
+	if #battle.enemies < battle.enemy_max and rnd() < battle.enemy_spawn_chance then
+		spawn_enemy()
+	end
+
+	-- enemy movement
+	for e in all(battle.enemies) do
+		e.x += e.v.x
+		e.y += e.v.y
+		e.ttl -= 1
+		if e.ttl < 0 then
+			del(battle.enemies, e)
+		end
+	end
+
+	-- win condition
 	if battle.collected == #battle.pickups then
 		_update = _update_dialog
 		_draw = _draw_dialog
@@ -218,6 +244,16 @@ function _update_battle()
 		dialog.battle = false
 		dialog.curr = 1
 	end
+end
+
+function spawn_enemy()
+	-- spawn enemy
+	_angle = flr(rnd(360))+1
+	_x = flr(rnd(64)) + 90*cos(_angle / 360)
+	_y = flr(rnd(32))+32  + 150*sin(_angle / 360)
+	_xvel = -1 * battle.enemy_speed*cos(_angle/360)
+	_yvel = -1 * battle.enemy_speed*sin(_angle/360)
+	add(battle.enemies, {x = _x, y = _y, v = {x = _xvel, y = _yvel}, ttl = battle.enemy_ttl})
 end
 
 function move_player()
@@ -381,11 +417,15 @@ function _draw_battle()
 
 	for pickup in all(battle.pickups) do
 		if pickup.active then
-			spr(17, pickup.x, pickup.y)
+			spr(pickup.sprite, pickup.x, pickup.y)
 		end
 	end
 
-	spr(1, battle.p.x, battle.p.y)
+	for e in all(battle.enemies) do
+		spr(battle.enemy_sprite, e.x, e.y)
+	end
+
+	spr(battle.p.sprite, battle.p.x, battle.p.y)
 end
 
 function draw_player()
