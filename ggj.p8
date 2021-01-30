@@ -111,7 +111,7 @@ dialog = {
 	battle = false
 }
 
-text = {
+intro_text = {
 		{ 8, "bonjour, amelie!", 30},
 		{ 8, "you found a box of mementos", 10, 12},
 		{ 8, "in the wall of your house", 13 },
@@ -220,26 +220,26 @@ function move_player()
 		p.x -= 1
 		animations.p.dir = 1
 		if chk_npc_coll(0) then
-			p.x += 1
+			p.x += 0
 		end
 	elseif btn(➡️) then
 		p.x += 1
 		animations.p.dir = 2
 				if chk_npc_coll(0) then
-			p.x -= 1
+			p.x -= 0
 		end
 	end
 	if btn(⬆️) then
 		p.y -= 1
 		animations.p.dir = 3
 		if chk_npc_coll(0) then
-			p.y += 1
+			p.y += 0
 		end
 	elseif btn(⬇️) then
 		p.y += 1
 		animations.p.dir = 4
 		if chk_npc_coll(0) then
-			p.y -= 1
+			p.y -= 0
 		end
 	end
 end
@@ -328,7 +328,7 @@ end
 function _draw_intro()
 	cls(5)
 		local _y = 5
-		for l in all(text) do
+		for l in all(intro_text) do
 			if l[4] != nil then
 				_c = l[4]
 			else
@@ -348,35 +348,9 @@ end
 
 
 function _draw_walk()
-	-- draw player
-	cls(1)
-	if animations.p.dir == 0 then
-		spr(128, p.x, p.y, 2, 4)
-	elseif animations.p.dir == 1 then
-		if animations.p.active then
-			spr(130, p.x, p.y, 2, 4, true, false)
-		else
-			spr(132, p.x, p.y, 2, 4, true, false)
-		end
-	elseif animations.p.dir == 2 then
-		if animations.p.active then
-			spr(130, p.x, p.y, 2, 4, false, false)
-		else
-			spr(132, p.x, p.y, 2, 4, false, false)
-		end
-	elseif animations.p.dir == 3 then
-		if animations.p.active then
-			spr(136, p.x, p.y, 2, 4, false, false)
-		else
-			spr(136, p.x, p.y, 2, 4, true, false)
-		end
-	elseif animations.p.dir == 4 then
-		if animations.p.active then
-			spr(134, p.x, p.y, 2, 4, true, false)
-		else
-			spr(134, p.x, p.y, 2, 4, false, false)
-		end
-	end
+ cls(1)
+ -- draw player
+ draw_player()
 
 	-- draw npcs
 	draw_npcs()
@@ -406,9 +380,45 @@ function _draw_battle()
 	spr(1, battle.p.x, battle.p.y)
 end
 
+function draw_player()
+	-- draw player
+	if animations.p.dir == 0 then
+		spr(128, p.x, p.y, 2, 4)
+	elseif animations.p.dir == 1 then
+		if animations.p.active then
+			spr(130, p.x, p.y, 2, 4, true, false)
+		else
+			spr(132, p.x, p.y, 2, 4, true, false)
+		end
+	elseif animations.p.dir == 2 then
+		if animations.p.active then
+			spr(130, p.x, p.y, 2, 4, false, false)
+		else
+			spr(132, p.x, p.y, 2, 4, false, false)
+		end
+	elseif animations.p.dir == 3 then
+		if animations.p.active then
+			spr(136, p.x, p.y, 2, 4, false, false)
+		else
+			spr(136, p.x, p.y, 2, 4, true, false)
+		end
+	elseif animations.p.dir == 4 then
+		if animations.p.active then
+			spr(134, p.x, p.y, 2, 4, true, false)
+		else
+			spr(134, p.x, p.y, 2, 4, false, false)
+		end
+	end
+
+end
+
 function draw_npcs()
 	for npc in all(npcs) do
 		spr(npc.sprite, npc.x, npc.y, 2, 4)
+		if npc.y <= p.y then
+		 -- redraw player if they should be in front
+			draw_player()
+		end
 		if npc.active then
 			if animations.bob.active then
 				_offset = -1
