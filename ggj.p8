@@ -38,7 +38,7 @@ p = {
 npcs = {
 	{
 		active = false,
-		battle = false,
+		battle = true,
 		x = 0,
 		y = 0,
 		width = 16,
@@ -57,7 +57,7 @@ npcs = {
 	},
 	{
 		active = false,
-		battle = false,
+		battle = true,
 		x = 300, -- 128
 		y = 300, -- 128
 		width = 16,
@@ -224,9 +224,11 @@ function _update_dialog()
 end
 
 function init_battle()
-	for pickup in all(pickups) do
+	for pickup in all(battle.pickups) do
 		pickup.active = true
 	end
+	battle.p.x = 64
+	battle.p.y = 64
 	battle.enemies = {}
 	battle.collected = 0
 	battle.health = 3
@@ -307,7 +309,7 @@ function _update_battle()
 	if battle.health <= 0 then
 		_update = _update_dialog
 		_draw = _draw_dialog
-		dialog.lines = dialog.active_npc.loss_lines
+		dialog.lines = dialog.active_npc.lose_lines
 		dialog.battle = false
 		dialog.curr = 1
 	end
