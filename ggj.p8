@@ -32,6 +32,11 @@ animations = {
 		draw_step = 0.14,
 		step = 6,
 		r = 160
+	},
+	transition_end = {
+		final = 128,
+		curr = -30,
+		step = 3
 	}
 }
 p = {
@@ -239,6 +244,8 @@ function _update_dialog()
 		end
 	end
 
+	update_bob_anim()
+
 	camera(p.x-60, p.y-60)
 end
 
@@ -263,6 +270,16 @@ function _update_start_battle()
 		_update = _update_battle
 		_draw = _draw_battle
 		animations.transition.curr = 1
+	end
+end
+
+function _update_end_battle()
+	if animations.transition_end.curr >= animations.transition_end.final then
+		animations.transition_end.curr = 0
+		_update = _update_dialog
+		_draw = _draw_dialog
+	else
+		animations.transition_end.curr += animations.transition_end.step
 	end
 end
 
@@ -323,8 +340,6 @@ function _update_battle()
 
 	-- win condition
 	if battle.collected == #battle.pickups then
-		_update = _update_dialog
-		_draw = _draw_dialog
 		dialog.lines = dialog.active_npc.win_lines
 		dialog.active_npc.battle = false
 		dialog.battle = false
@@ -335,16 +350,24 @@ function _update_battle()
 			npcs[2].x = 128
 			npcs[2].y = 128
 		end
+
+		battle_end()
 	end
 
 	-- loss condition
 	if battle.health <= 0 then
-		_update = _update_dialog
-		_draw = _draw_dialog
 		dialog.lines = dialog.active_npc.lose_lines
 		dialog.battle = false
 		dialog.curr = 1
+		battle_end()
 	end
+
+end
+
+function battle_end()
+	_update_dialog()
+	_update = _update_end_battle
+	_draw = _draw_end_battle
 end
 
 function do_shake()
@@ -442,16 +465,7 @@ function update_npcs()
 end
 
 function update_animations()
-	if animations.bob.curr == animations.bob.final then
-		animations.bob.curr = 0
-	else
-		animations.bob.curr += 1
-	end
-	if animations.bob.curr < animations.bob.final/2 then
-		animations.bob.active = true
-	else
-		animations.bob.active = false
-	end
+	update_bob_anim()
 
 	if animations.p.curr == animations.p.final then
 		animations.p.curr = 0
@@ -462,6 +476,19 @@ function update_animations()
 		animations.p.active = true
 	else
 		animations.p.active = false
+	end
+end
+
+function update_bob_anim()
+	if animations.bob.curr == animations.bob.final then
+		animations.bob.curr = 0
+	else
+		animations.bob.curr += 1
+	end
+	if animations.bob.curr < animations.bob.final/2 then
+		animations.bob.active = true
+	else
+		animations.bob.active = false
 	end
 end
 
@@ -545,6 +572,14 @@ function _draw_dialog()
 		print(l, p.x-56, p.y-b)
 		b -= 6
 	end
+	-- dialog continue arrow
+	if animations.bob.active then
+		_offset = 1
+	else
+		_offset = 0
+	end
+	rectfill(p.x+58, p.y-38+_offset, p.x+60, p.y-37+_offset, 7)
+	pset(p.x+59, p.y-36+_offset, 7)
 end
 
 -- battle start cutscene
@@ -553,6 +588,12 @@ function _draw_start_battle()
 	for a=1,animations.transition.curr,animations.transition.draw_step do
 		line(p.x, p.y, p.x+(animations.transition.r*cos(a/360)), p.y+(animations.transition.r*sin(a/360)), 5)
 	end
+end
+
+function _draw_end_battle()
+	_draw_dialog()
+	rectfill(p.x-70, p.y-70+animations.transition_end.curr, p.x+70, p.y+70, 5)
+	-- spr(battle.p.sprite, p.x - 50 + battle.p.x, battle.p.y - 58 + battle.p.y)
 end
 
 function _draw_battle()
