@@ -42,10 +42,12 @@ animations = {
 p = {
 	x = 975,
 	y = 30,
+	speed = 2,
 	width=16,
 	height=32,
-	interact_rad = 40,
-	exp = 0
+	interact_rad = 150,
+	exp = 0,
+	prompt_final = false
 }
 npcs = {
 	{ -- woman
@@ -56,6 +58,7 @@ npcs = {
 		width = 16,
 		height = 32,
 		sprite = 69,
+		v_offset = 5,
 		lines = {
 			{"* you politely greet the", "beautiful lady. *"},
 			{"please join me for tea!"}
@@ -75,7 +78,7 @@ npcs = {
 		width = 16,
 		height = 32,
 		sprite = 65,
-		
+		v_offset = 5,
 		lines = {
 			{"* you know in your heart", "that this is dominique. *"}
 		},
@@ -94,6 +97,7 @@ npcs = {
 		width = 16,
 		height = 32,
 		sprite = 77,
+		v_offset = 5,
 		lines = {
 			{"* you politely greet the", "young man. *"},
 			{"what do you need?"}
@@ -116,6 +120,7 @@ npcs = {
 		width = 16,
 		height = 32,
 		sprite = 67,
+		v_offset = 5,
 		lines = {
 			{"i heard you were looking", "for the boy who used to live", "in your house."},
 			{"his name is not dominique", "bredoteau!"},
@@ -135,6 +140,7 @@ npcs = {
 		width = 16,
 		height = 32,
 		sprite = 1,
+		v_offset = 5,
 		lines = {
 			{"* you slowly approach the", "casket. *"},
 			{"* a feeling of dread", "overwhelms you. *"}
@@ -191,11 +197,22 @@ battle = {
 	win = false
 }
 
+cam = {
+	x = 0,
+	y = 0
+}
+
 dialog = {
 	active_npc = {},
 	lines = {},
 	curr = 1,
 	battle = false
+}
+
+return_prompt = {
+	{"you have given up on your journey to return the box"},
+	{"as none of the dominique bredoteaus you have found are the one you seek."},
+	{"maybe your neighbor can console you..."}
 }
 
 intro_text = {
@@ -289,8 +306,11 @@ function update_camera() -- used to keep camera in bounds
 	elseif p.y >= 176 then
 		oy = 128
 	end
+
+	cam.x = ox
+	cam.y = oy
 	
-			camera(ox, oy)
+	camera(ox, oy)
 end
 
 function _update_dialog()
@@ -314,8 +334,9 @@ function _update_dialog()
 	end
 
 	update_bob_anim()
+	update_camera()
 
-	camera(p.x-60, p.y-60)
+	-- camera(p.x-60, p.y-60)
 end
 
 function init_battle()
@@ -503,39 +524,48 @@ end
 function move_player()
 	animations.p.dir = 0
 	if btn(⬅️) then
-		p.x -= 1
+		p.x -= p.speed
 		animations.p.dir = 1
-		if chk_npc_coll(0) then
-			p.x += 1
+		if chk_npc_coll(0) or chk_map_coll(1) then
+			p.x += p.speed
 		end
 	elseif btn(➡️) then
-		p.x += 1
+		p.x += p.speed
 		animations.p.dir = 2
-				if chk_npc_coll(0) then
-			p.x -= 1
+		if chk_npc_coll(0) or chk_map_coll(2) then
+			p.x -= p.speed
 		end
 	end
 	if btn(⬆️) then
-		p.y -= 1
+		p.y -= p.speed
 		animations.p.dir = 3
-		if chk_npc_coll(0) then
-			p.y += 1
+		if chk_npc_coll(0) or chk_map_coll(3) then
+			p.y += p.speed
 		end
 	elseif btn(⬇️) then
-		p.y += 1
+		p.y += p.speed
 		animations.p.dir = 4
-		if chk_npc_coll(0) then
-			p.y -= 1
+		if chk_npc_coll(0) or chk_map_coll(4) then
+			p.y -= p.speed
 		end
 	end
 end
 
 function chk_dialog()
+	-- prompt return to home
+	if p.exp == 3 and not p.prompt_final then
+		_update = _update_dialog
+		_draw = _draw_dialog
+		dialog.lines = return_prompt
+		dialog.curr = 1
+		p.prompt_final = true
+	end
+
 	-- end game
-		if p.exp == 5 then
-		_draw = _draw_ending
-		_update = _update_ending
-		end
+	if p.exp == 5 then
+	_draw = _draw_ending
+	_update = _update_ending
+	end
 
 	-- check whether to enter dialog mode
 	if btnp(🅾️) then
@@ -673,13 +703,16 @@ function _draw_dialog()
 	_draw_walk()
 
 	-- draw the dialog box
-	rectfill(p.x-60, p.y-60, p.x+64, p.y-32, 0)
-	rect(p.x-60, p.y-60, p.x+64, p.y-32, 7)
+	rectfill(cam.x+2, cam.y+2, cam.x+125, cam.y+32, 0)
+	rect(cam.x+2, cam.y+2, cam.x+125, cam.y+32, 7)
+	-- rectfill(p.x-60, p.y-60, p.x+64, p.y-32, 0)
+	-- rect(p.x-60, p.y-60, p.x+64, p.y-32, 7)
+
 	-- draw the text
-	local b = 56
+	local b = 0
 	for l in all(dialog.lines[dialog.curr]) do
-		print(l, p.x-56, p.y-b)
-		b -= 6
+		print(l, cam.x+8, cam.y+8+b)
+		b += 6
 	end
 	-- dialog continue arrow
 	if animations.bob.active then
@@ -687,8 +720,10 @@ function _draw_dialog()
 	else
 		_offset = 0
 	end
-	rectfill(p.x+58, p.y-38+_offset, p.x+60, p.y-37+_offset, 7)
-	pset(p.x+59, p.y-36+_offset, 7)
+	pset(cam.x+120, cam.y+27+_offset, 7)
+	rectfill(cam.x+119, cam.y+25+_offset, cam.x+121, cam.y+26+_offset, 7)
+	-- rectfill(p.x+58, p.y-38+_offset, p.x+60, p.y-37+_offset, 7)
+	-- pset(p.x+59, p.y-36+_offset, 7)
 end
 
 -- battle start cutscene
@@ -734,30 +769,30 @@ end
 function draw_player()
 	-- draw player
 	if animations.p.dir == 0 then
-		spr(128, p.x, p.y, 2, 4)
+		spr(129, p.x, p.y, 2, 4)
 	elseif animations.p.dir == 1 then
 		if animations.p.active then
-			spr(130, p.x, p.y, 2, 4, true, false)
+			spr(131, p.x, p.y, 2, 4, true, false)
 		else
-			spr(132, p.x, p.y, 2, 4, true, false)
+			spr(133, p.x, p.y, 2, 4, true, false)
 		end
 	elseif animations.p.dir == 2 then
 		if animations.p.active then
-			spr(130, p.x, p.y, 2, 4, false, false)
+			spr(131, p.x, p.y, 2, 4, false, false)
 		else
-			spr(132, p.x, p.y, 2, 4, false, false)
+			spr(133, p.x, p.y, 2, 4, false, false)
 		end
 	elseif animations.p.dir == 3 then
 		if animations.p.active then
-			spr(136, p.x, p.y, 2, 4, false, false)
+			spr(137, p.x, p.y, 2, 4, false, false)
 		else
-			spr(136, p.x, p.y, 2, 4, true, false)
+			spr(137, p.x, p.y, 2, 4, true, false)
 		end
 	elseif animations.p.dir == 4 then
 		if animations.p.active then
-			spr(134, p.x, p.y, 2, 4, true, false)
+			spr(135, p.x, p.y, 2, 4, true, false)
 		else
-			spr(134, p.x, p.y, 2, 4, false, false)
+			spr(135, p.x, p.y, 2, 4, false, false)
 		end
 	end
 
@@ -770,14 +805,16 @@ function draw_npcs()
 		 -- redraw player if they should be in front
 			draw_player()
 		end
+		_color = 7
 		if npc.active then
+			_color = 14
+		end
 			if animations.bob.active then
 				_offset = -1
 			else
 				_offset = 0
 			end
-			print("🅾️", npc.x+4, npc.y-10+_offset, 7)
-		end
+			print("🅾️", npc.x+4, npc.y-npc.v_offset+_offset, _color)
 	end
 end
 
@@ -816,6 +853,28 @@ function chk_npc_coll(rad)
 	return nil
 end
 
+function chk_map_coll(dir)
+	-- we check map collision for the bottom half of the sprite
+	if dir == 1 then -- left
+		_x = p.x + 3
+		_y = p.y + 32
+	elseif dir == 2 then -- right
+		_x = p.x + 12
+		_y = p.y + 32
+	elseif dir == 3 then -- up
+		_x = p.x + 8
+		_y = p.y + 24
+	elseif dir == 4 then -- down
+		_x = p.x + 8
+		_y = p.y + 33
+	else
+		return nil
+	end
+
+	map_x = _x / 8
+	map_y = _y / 8
+	return fget(mget(map_x, map_y), 0)
+end
 
 
 __gfx__
@@ -947,6 +1006,9 @@ bbbbbfbbbfbbbbbbbbbbbf4444411bbbbbbbbbbbbbbbbb555511bbbb444544445444454454444544
 bbbbbfbbbfbbbbbbbbbbf4444441111bbbbbbbbbbbbbb5511111bbbb4445544455444554554445540000000000000000b888888b7aaaaaa66666666656666666
 bbbbb4bbbfbbbbbbbbbf444544444111bbbbbbbbbbbb515111111bbb4444544445444454454444540000000000000000b888888b767676766666666555666666
 bbbbbbbbb4bbbbbbb4444544454444111bbbbbbbbbb55111115111bb4444544445444454454444540000000000000000bbbbbbbb767676766666665555566666
+__gff__
+0000000100010100000000000001010100000001000101000000000000010101000000000000000000000000000101010000000000000000000000000001010100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __map__
 1313131313131313131313136867676905060506050605060505060d0e0d0e0f0d0e0d0e0f0e0d0e0f0e0d0e0f0e0d0e0f0d0e0f686767676767676767676769cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd686767690506050605060506050506686767690303030303030303030303030303030303030303030303030303030303
 13131313131313131313131377cecf7715161516151615161515161d1e1d1e1f1d1e1d1e1f1e1d1e1f1e1d1e1f1e1d1e1f1d1e1f77090a6a6a6a6a6a6a070877cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd77cecf77151615161516151615151677cecf770303030303030303030303030303030303030303030303030303030303
