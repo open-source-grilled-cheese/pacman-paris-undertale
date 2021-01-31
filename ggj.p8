@@ -324,6 +324,17 @@ function _update_dialog()
 			dialog.curr += 1
 		elseif dialog.battle then
 			-- enter battle minigame
+			
+			-- choose correct enemy sprite
+			if dialog.active_npc.sprite == 77 then
+				battle.enemy_sprite = 251
+			elseif dialog.active_npc.sprite == 69 then
+				battle.enemy_sprite = 235
+			elseif dialog.active_npc.sprite == 65 then
+				battle.enemy_sprite = 250
+			elseif dialog.active_npc.sprite == 1 then
+				battle.enemy_sprite = 237
+			end 
 			init_battle()
 		else
 			-- return to walking mode
