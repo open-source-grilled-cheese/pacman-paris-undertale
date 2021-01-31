@@ -331,7 +331,7 @@ dialog = {
 
 return_prompt = {
 	{"you have given up on your", "journey to return the box"},
-	{"as none of the dominique", "bredoteaus you have found are", "the one you seek."},
+	{"as none of the dominique", "bredoteaus you have found", "are the one you seek."},
 	{"maybe your neighbor", "can console you..."}
 }
 
