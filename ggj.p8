@@ -267,6 +267,7 @@ end
 -- update functions
 function _update_title()
 	if btnp(🅾️) then
+		sfx(45)
 		_update = _update_intro
 		_draw = _draw_intro
 	end
@@ -289,6 +290,11 @@ function _update_intro()
 	 end
 
 	 if btnp(🅾️) then
+<<<<<<< Updated upstream
+=======
+	 	sfx(45)
+	 	music(9)
+>>>>>>> Stashed changes
 		_update = _update_walk
 		_draw = _draw_walk
 		end
@@ -335,6 +341,7 @@ end
 
 function _update_dialog()
 	if btnp(🅾️) then
+		sfx(44)
 		if dialog.curr < #dialog.lines then
 			dialog.curr += 1
 		elseif dialog.battle then
@@ -410,6 +417,7 @@ function init_battle()
 	battle.enemies = {}
 	battle.collected = 0
 	battle.health = 4
+	music(3)
 	take_dmg()
 	_update = _update_start_battle
 	_draw = _draw_start_battle
@@ -430,6 +438,7 @@ function _update_end_battle()
 		animations.transition_end.curr = 0
 		_update = _update_dialog
 		_draw = _draw_dialog
+		music(9)
 	else
 		animations.transition_end.curr += animations.transition_end.step
 	end
@@ -481,6 +490,7 @@ function _update_battle()
 			   battle.p.y <= pickup.y+pickup.h then
 				pickup.active = false
 				battle.collected += 1
+				sfx(47)
 			end
 		end
 	end
@@ -521,6 +531,7 @@ function _update_battle()
 			spawn_neighbor()
 		end
 
+		sfx(50)
 		battle_end()
 	end
 
@@ -529,12 +540,14 @@ function _update_battle()
 		dialog.lines = dialog.active_npc.lose_lines
 		dialog.battle = false
 		dialog.curr = 1
+		sfx(49)
 		battle_end()
 	end
 
 end
 
 function battle_end()
+	music(-1)
 	_update_dialog()
 	_update = _update_end_battle
 	_draw = _draw_end_battle
@@ -555,6 +568,7 @@ function do_shake()
 end
 
 function take_dmg()
+	sfx(46)
 	battle.health -= 1
 	battle.invincibility = battle.iframes
 	animations.shake.strength = animations.shake.max_strength
@@ -622,6 +636,7 @@ function chk_dialog()
 		for npc in all(npcs) do
 			if npc.active then
 				-- enter dialog mode
+				sfx(44)
 				_update = _update_dialog
 				_draw = _draw_dialog
 				dialog.active_npc = npc
