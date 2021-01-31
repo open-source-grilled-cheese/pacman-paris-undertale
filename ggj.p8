@@ -290,11 +290,8 @@ function _update_intro()
 	 end
 
 	 if btnp(🅾️) then
-<<<<<<< Updated upstream
-=======
 	 	sfx(45)
 	 	music(9)
->>>>>>> Stashed changes
 		_update = _update_walk
 		_draw = _draw_walk
 		end
