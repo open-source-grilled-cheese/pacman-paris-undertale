@@ -242,12 +242,18 @@ intro_text = {
 	}
 	
 	ending_text = {
-		{ 6, "you successfully returned", 3},
-		{ 12, "the box to dominique bretodeau!", 3},
-		{ 12, "the box has found its way home.", 3},
-		{ 6, "your life's passion is now", 3},
-		{ 24, "to do good for others.", 3},
-		{ 6, "the end", 3}
+		{ 6, "you hand the box of mementos", 3},
+		{ 6, "to dominique bretodeau", 3},
+		{ 6, "and his eyes fill with tears", 3},
+		{ 6, "as he looks through", 3},
+		{ 6, "his long lost", 3},
+		{ 12, "childhood memories.", 3},
+		{ 6, "the box has found its way home,", 3},
+		{ 6, "and you are fulfilled,", 3},
+		{ 6, "so much so that", 3},
+		{ 6, "your life's passion is", 3},
+		{ 12, "now to do good for others.", 3},
+		{ 6, "the end", 3} 
 	}
 
 function _update_empty()
