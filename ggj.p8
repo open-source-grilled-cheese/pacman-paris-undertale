@@ -86,7 +86,7 @@ npcs = {
 			{"* you approach the old man *"}
 		},
 		lose_lines = {
-			{"* you are too nervous to approach. *"}
+			{"* you are too nervous", "to approach. *"}
 		}
 	},
 	{ -- young man
@@ -539,7 +539,7 @@ function move_player()
 	if btn(⬆️) then
 		p.y -= p.speed
 		animations.p.dir = 3
-		if chk_npc_coll(0) or chk_map_coll(3) or p.y <= 0 then
+		if chk_npc_coll(0) or chk_map_coll(3) or p.y <= -24 then
 			p.y += p.speed
 		end
 	elseif btn(⬇️) then
@@ -801,7 +801,7 @@ end
 function draw_npcs()
 	for npc in all(npcs) do
 		spr(npc.sprite, npc.x, npc.y, 2, 4)
-		if npc.y <= p.y then
+		if npc.y <= p.y and abs(p.x-npc.x) < 50 then
 		 -- redraw player if they should be in front
 			draw_player()
 		end
@@ -841,16 +841,14 @@ function dist(a_x, a_y, b_x, b_y)
 end
 
 function chk_npc_coll(rad)
-	local i = 1
 	for npc in all(npcs) do
 	if p.x-rad <= npc.x+npc.width and
 		   p.x + p.width >= npc.x-rad and
-		   p.y == npc.y then
-		   return i
+		   abs(p.y-npc.y) < 2 then
+		   return true
 	 end
-	i+= 1
 	end
-	return nil
+	return false
 end
 
 function chk_map_coll(dir)
