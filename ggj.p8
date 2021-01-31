@@ -1048,7 +1048,7 @@ for object in all(objects) do
 end
 
 function _draw_ending()
-	cls(1)
+	cls(3)
 	local _y = 5
 	for l in all(ending_text) do
 		if l[4] != nil then
