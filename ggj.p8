@@ -425,10 +425,10 @@ function _update_battle()
 	-- pickup logic
 	for pickup in all(battle.pickups) do
 		if pickup.active then
-			if battle.p.x > pickup.x and
-			   battle.p.x < pickup.x+pickup.w and
-			   battle.p.y > pickup.y and
-			   battle.p.y < pickup.y+pickup.h then
+			if battle.p.x+battle.p.w >= pickup.x and
+			   battle.p.x <= pickup.x+pickup.w and
+			   battle.p.y+battle.p.h >= pickup.y and
+			   battle.p.y <= pickup.y+pickup.h then
 				pickup.active = false
 				battle.collected += 1
 			end
@@ -746,24 +746,31 @@ function _draw_battle()
 
 	do_shake()
 
+	-- draw creme brulee
 	for pickup in all(battle.pickups) do
 		if pickup.active then
 			spr(pickup.sprite, pickup.x, pickup.y)
 		end
 	end
 
+	-- draw enemies
 	for e in all(battle.enemies) do
 		spr(battle.enemy_sprite, e.x, e.y)
 	end
 
+	-- draw player
 	spr(battle.p.sprite, battle.p.x, battle.p.y)
 	if battle.invincibility > 0 then
 		circ(battle.p.x + 4, battle.p.y+4, 7, 7)
 	end
 
+	-- draw health croissants
 	for h = 1, battle.health do
 		spr(171, h*16-16, 110, 2, 2)
 	end
+
+	-- instructions
+	print("collect all the creme brulee!", 6, 16, 0)
 end
 
 function draw_player()
