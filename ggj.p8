@@ -118,6 +118,7 @@ battle = {
 		speed = 1.5
 	},
 	pickups = {
+		--[[
 		{
 			sprite = 220,
 			x = 16,
@@ -133,7 +134,7 @@ battle = {
 			w = 8,
 			h = 8,
 			active = true
-		}
+		}--]]
 	},
 	enemies = {},
 	enemy_max = 35,
@@ -250,9 +251,40 @@ function _update_dialog()
 end
 
 function init_battle()
-	for pickup in all(battle.pickups) do
-		pickup.active = true
-	end
+	-- spawn pickups
+	battle.pickups = {}
+	add(battle.pickups, {
+		sprite = 220,
+		x = flr(rnd(64)),
+		y = flr(rnd(64)),
+		w = 8,
+		h = 8,
+		active = true
+	})
+	add(battle.pickups, {
+		sprite = 220,
+		x = flr(rnd(64)),
+		y = 58+flr(rnd(64)),
+		w = 8,
+		h = 8,
+		active = true
+	})
+	add(battle.pickups, {
+		sprite = 220,
+		x = 58+flr(rnd(64)),
+		y = flr(rnd(64)),
+		w = 8,
+		h = 8,
+		active = true
+	})
+	add(battle.pickups, {
+		sprite = 220,
+		x = 58+flr(rnd(64)),
+		y = 58+flr(rnd(64)),
+		w = 8,
+		h = 8,
+		active = true
+	})
 	battle.p.x = 64
 	battle.p.y = 64
 	battle.enemies = {}
