@@ -160,8 +160,9 @@ intro_text = {
 	}
 	
 	ending_text = {
-		{ 6, "you successfully returned", 30},
+		{ 6, "you successfully returned", 3},
 		{ 12, "the box to dominique bretodeau!", 3},
+		{ 12, "the box has found its way home.", 3},
 		{ 6, "your life's passion is now", 3},
 		{ 24, "to do good for others.", 3},
 		{ 6, "the end", 3}
