@@ -539,13 +539,13 @@ function move_player()
 	if btn(⬆️) then
 		p.y -= p.speed
 		animations.p.dir = 3
-		if chk_npc_coll(0) or chk_map_coll(3) then
+		if chk_npc_coll(0) or chk_map_coll(3) or p.y <= 0 then
 			p.y += p.speed
 		end
 	elseif btn(⬇️) then
 		p.y += p.speed
 		animations.p.dir = 4
-		if chk_npc_coll(0) or chk_map_coll(4) then
+		if chk_npc_coll(0) or chk_map_coll(4) or p.y >= 224  then
 			p.y -= p.speed
 		end
 	end
