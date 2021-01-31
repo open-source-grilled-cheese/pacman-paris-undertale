@@ -162,7 +162,7 @@ battle = {
 		y = 64,
 		w = 8,
 		h = 8,
-		speed = 1.5
+		speed = 2.5
 	},
 	pickups = {
 		--[[
@@ -184,11 +184,11 @@ battle = {
 		}--]]
 	},
 	enemies = {},
-	enemy_max = 35,
+	enemy_max = 50,
 	enemy_min_speed = 2,
-	enemy_speed_range = 2,
+	enemy_speed_range = 3,
 	enemy_sprite = 237,
-	enemy_spawn_chance = 0.3,
+	enemy_spawn_chance = 0.4,
 	enemy_ttl = 150,
 	collected = 0,
 	health = 3,
@@ -443,9 +443,9 @@ function _update_battle()
 
 	for e in all(battle.enemies) do
 		-- enemy collision check
-		if battle.p.x >= e.x and
+		if battle.p.x+battle.p.w >= e.x and
 		   battle.p.x <= e.x+e.w and
-		   battle.p.y >= e.y  and
+		   battle.p.y+battle.p.h >= e.y  and
 		   battle.p.y <= e.y+e.h and
 		   battle.invincibility == 0 then
 			take_dmg()
@@ -513,8 +513,8 @@ end
 function spawn_enemy()
 	-- spawn enemy
 	_angle = flr(rnd(360))+1
-	_x = flr(rnd(32))+32 + 120*cos(_angle / 360)
-	_y = flr(rnd(32))+32 + 120*sin(_angle / 360)
+	_x = 64 + flr(rnd(127))-64 + 180*cos(_angle / 360)
+	_y = 64 + flr(rnd(127))-64 + 180*sin(_angle / 360)
 	_speed = rnd(battle.enemy_speed_range) + battle.enemy_min_speed
 	_xvel = -1 * _speed*cos(_angle/360)
 	_yvel = -1 * _speed*sin(_angle/360)
