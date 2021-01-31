@@ -162,7 +162,12 @@ battle = {
 		y = 64,
 		w = 8,
 		h = 8,
-		speed = 2.5
+		speed = 2.5,
+		boost_speed = 7,
+		boost_duration = 3,
+		boost_cooldown = 0,
+		boost_cooldown_max = 10,
+		boost = 0
 	},
 	pickups = {
 		--[[
@@ -405,16 +410,35 @@ function _update_end_battle()
 end
 
 function _update_battle()
-	-- player movement
-	if btn(⬅️) and battle.p.x > 0 then
-		battle.p.x -= battle.p.speed
-	elseif btn(➡️) and battle.p.x < 127 then
-		battle.p.x += battle.p.speed
+	if btn(🅾️) and 
+	   battle.p.boost == 0 and
+	   battle.p.boost_cooldown == 0 then
+		_speed = battle.p.boost_speed
+		battle.p.boost = battle.p.boost_duration
+	elseif battle.p.boost > 0 then
+		_speed = battle.p.boost_speed
+		battle.p.boost -= 1
+		if battle.p.boost == 0 then
+			battle.p.boost_cooldown = battle.p.boost_cooldown_max
+		end
+	else
+		_speed = battle.p.speed
+		if battle.p.boost_cooldown > 0 then
+			battle.p.boost_cooldown -= 1
+		end
 	end
-	if btn(⬆️) and battle.p.y > 0 then
-		battle.p.y -= battle.p.speed
-	elseif btn(⬇️) and battle.p.y < 127 then
-		battle.p.y += battle.p.speed
+
+
+	-- player movement
+	if btn(⬅️) and battle.p.x > battle.p.speed then
+		battle.p.x -= _speed
+	elseif btn(➡️) and battle.p.x+8 < 127 then
+		battle.p.x += _speed
+	end
+	if btn(⬆️) and battle.p.y > battle.p.speed then
+		battle.p.y -= _speed
+	elseif btn(⬇️) and battle.p.y+8 < 127 then
+		battle.p.y += _speed
 	end
 
 	-- deplete iframes
@@ -769,8 +793,14 @@ function _draw_battle()
 		spr(171, h*16-16, 110, 2, 2)
 	end
 
+	-- draw boost baguette
+	if battle.p.boost_cooldown == 0 then
+		spr(139, 110, 110, 2, 2)
+	end
+
 	-- instructions
 	print("collect all the creme brulee!", 6, 16, 0)
+	print("press z to boost", 24, 24, 0)
 end
 
 function draw_player()
