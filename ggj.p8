@@ -308,7 +308,7 @@ battle = {
 	enemy_min_speed = 2,
 	enemy_speed_range = 3,
 	enemy_sprite = 237,
-	enemy_spawn_chance = 0.4,
+	enemy_spawn_chance = 0.2,
 	enemy_ttl = 150,
 	collected = 0,
 	health = 3,
@@ -639,6 +639,8 @@ function _update_battle()
 		dialog.battle = false
 		dialog.curr = 1
 		p.exp += 1
+		battle.enemy_spawn_chance += 0.1
+
 
 		if p.exp == 3 then -- see all 3 fakes
 			spawn_neighbor()
