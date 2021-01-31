@@ -45,7 +45,7 @@ p = {
 	speed = 2,
 	width=16,
 	height=32,
-	interact_rad = 150,
+	interact_rad = 300,
 	exp = 0,
 	prompt_final = false
 }
@@ -210,9 +210,9 @@ dialog = {
 }
 
 return_prompt = {
-	{"you have given up on your journey to return the box"},
-	{"as none of the dominique bredoteaus you have found are the one you seek."},
-	{"maybe your neighbor can console you..."}
+	{"you have given up on your", "journey to return the box"},
+	{"as none of the dominique", "bredoteaus you have found are", "the one you seek."},
+	{"maybe your neighbor", "can console you..."}
 }
 
 intro_text = {
@@ -730,13 +730,13 @@ end
 function _draw_start_battle()
 	_draw_dialog()
 	for a=1,animations.transition.curr,animations.transition.draw_step do
-		line(p.x, p.y, p.x+(animations.transition.r*cos(a/360)), p.y+(animations.transition.r*sin(a/360)), 5)
+		line(cam.x+64, cam.y+64, cam.x+64+(animations.transition.r*cos(a/360)), cam.y+64+(animations.transition.r*sin(a/360)), 5)
 	end
 end
 
 function _draw_end_battle()
 	_draw_dialog()
-	rectfill(p.x-70, p.y-70+animations.transition_end.curr, p.x+70, p.y+70, 5)
+	rectfill(cam.x, cam.y+animations.transition_end.curr, cam.x+127, cam.y+127, 5)
 	-- spr(battle.p.sprite, p.x - 50 + battle.p.x, battle.p.y - 58 + battle.p.y)
 end
 
