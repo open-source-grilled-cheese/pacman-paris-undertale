@@ -1,5 +1,5 @@
 pico-8 cartridge // http://www.pico-8.com
-version 29
+version 27
 __lua__
 -- init data
 animations = {
@@ -261,6 +261,7 @@ function _update_empty()
 end
 
 function _init()
+	music(1)
 	_update = _update_title
 	_draw = _draw_title
 	base = 110
@@ -295,6 +296,7 @@ function _update_intro()
 	 end
 
 	 if btnp(🅾️) then
+	 	music(9)
 		_update = _update_walk
 		_draw = _draw_walk
 		end
