@@ -1,5 +1,5 @@
 pico-8 cartridge // http://www.pico-8.com
-version 29
+version 27
 __lua__
 -- init data
 animations = {
@@ -980,10 +980,12 @@ function draw_player()
 
 end
 
+radius = 8
+
 function draw_npcs()
 	for npc in all(npcs) do
 		spr(npc.sprite, npc.x, npc.y, 2, 4)
-		if npc.y <= p.y and abs(p.x-npc.x) < 50 then
+		if npc.y <= p.y and p.y-npc.y < 40 and abs(p.x - npc.x) < radius then
 		 -- redraw player if they should be in front
 			draw_player()
 		end
@@ -1003,9 +1005,17 @@ end
 function draw_objects()
 for object in all(objects) do
 		spr(object.sprite, object.x, object.y, object.width, object.height)
-		if object.y <= p.y and abs(p.x-object.x) < 50 then
-		 -- redraw player if they should be in front
-			draw_player()
+		
+		if object.sprite == 35 then -- benches
+			if object.y <= p.y + 12 and p.y-object.y < 20 and abs(p.x-object.x) < 2.5*radius then
+		 	-- redraw player if they should be in front
+				draw_player()
+			end
+		else
+			if object.y <= p.y and p.y-object.y < 40 and abs(p.x-object.x) < radius then
+		 	-- redraw player if they should be in front
+				draw_player()
+			end
 		end
 	end
 end
