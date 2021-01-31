@@ -691,15 +691,13 @@ end
 -->8
 -- draw functions
 
-function _draw_title()
-	cls(0)
-	rectfill(0, 0, 128, 90, 3)
+function draw_title_text(offset_x, offset_y)
 	local line1 = {71, 72, 73, 122, 74, 75, 76, 108, 73, 124, 87}
 	local line2 = {88, 89, 90, 122, 91, 75, 92, 73}
 	local wx = 8
 	local wy = 24
 	for l in all(line1) do
-		spr(l, wx, wy, 1, 1)
+		spr(l, wx+1+offset_x, wy+1+offset_y, 1, 1)
 		wx += 7
 	end
 
@@ -707,11 +705,25 @@ function _draw_title()
 	wx = 50
 
 	for l in all(line2) do
-		spr(l, wx, wy, 1, 1)
+		spr(l, wx+offset_x, wy+offset_y, 1, 1)
 		wx += 7
 	end
+end
+
+function _draw_title()
+	cls(0)
+	rectfill(0, 0, 128, 90, 3)
+
+
+	pal(9, 5)
+	draw_title_text(-1, -1)
+	pal()
+	palt(11, true)
+	palt(0, false)
+	draw_title_text(0, 0)
 
 	if animations.title_prompt.active then
+		print("press 🅾️ to begin", 29, 63, 0)
 		print("press 🅾️ to begin", 30, 64, 7)
 	end
 	print ("◆ggj 2021◆", 40, 100, 7)
